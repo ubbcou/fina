@@ -1,0 +1,31 @@
+:root {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --primary: #06b6d4; /* Cyan 500 */
+  --text-muted: #94a3b8;
+  
+  --wscn-color: #2563eb;
+  --jin10-color: #d97706;
+  --cls-color: #dc2626;
+  --ths-color: #ea580c;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
