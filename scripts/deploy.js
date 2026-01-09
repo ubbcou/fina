@@ -5,9 +5,10 @@ require('dotenv').config();
 
 // Configuration
 const SERVER_IP = process.env.DEPLOY_SERVER_IP;
-const REMOTE_USER = process.env.DEPLOY_REMOTE_USER || 'root';
-const REMOTE_PATH = process.env.DEPLOY_REMOTE_PATH || '/root/workspace/web';
+const REMOTE_USER = process.env.DEPLOY_REMOTE_USER;
+const REMOTE_PATH = process.env.DEPLOY_REMOTE_PATH;
 const PROJECT_NAME = process.env.DEPLOY_PROJECT_NAME || 'fina';
+const PORT = process.env.DEPLOY_PORT || '3000';
 const TAR_FILE = `${PROJECT_NAME}.tar.gz`;
 
 if (!SERVER_IP) {
@@ -54,6 +55,7 @@ async function deploy() {
 
     // 3. Upload to server
     console.log(`Uploading ${TAR_FILE} to ${SERVER_IP}...`);
+    run(`ssh ${REMOTE_USER}@${SERVER_IP} "mkdir -p ${REMOTE_PATH}"`);
     run(`scp ${TAR_FILE} ${REMOTE_USER}@${SERVER_IP}:${REMOTE_PATH}`);
 
     // 4. Extract on server
@@ -63,7 +65,8 @@ async function deploy() {
         `tar xzf ${TAR_FILE}`,
         `rm ${TAR_FILE}`,
         'npm install --production',
-        // 'pm2 restart fina' // If using pm2
+        `pm2 delete ${PROJECT_NAME} || true`,
+        `pm2 start npm --name "${PROJECT_NAME}" -- start -- -p ${PORT}`
     ].join(' && ');
 
     run(`ssh ${REMOTE_USER}@${SERVER_IP} "${remoteCommands}"`);

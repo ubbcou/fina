@@ -23,7 +23,7 @@ export async function fetchWSCN(): Promise<FetchResult> {
             content: item.content_text,
             time: item.display_time,
             source: 'wscn',
-            url: item.uri || `https://wallstreetcn.com/live/global/${item.id}`,
+            url: item.uri || `https://wallstreetcn.com/livenews/${item.id}`,
             tags: item.tags
         }));
 
