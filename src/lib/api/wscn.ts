@@ -19,8 +19,8 @@ export async function fetchWSCN(): Promise<FetchResult> {
 
         const items: NewsItem[] = response.data.data.items.map((item: any) => ({
             id: `wscn-${item.id}`,
-            title: item.title || item.content_text.slice(0, 30) + '...',
-            content: item.content_text,
+            title: item.title,
+            content: item.content_text || item.title,
             time: item.display_time,
             source: 'wscn',
             url: item.uri || `https://wallstreetcn.com/livenews/${item.id}`,

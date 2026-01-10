@@ -1,11 +1,11 @@
 :root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  --background: #f6f8ff;
+  --foreground: #373737;
   --card-bg: rgba(255, 255, 255, 0.05);
   --card-border: rgba(255, 255, 255, 0.1);
-  --primary: #06b6d4; /* Cyan 500 */
-  --text-muted: #94a3b8;
-  
+  --primary: #06b6d4;
+  --text-muted: #46566e;
+
   --wscn-color: #2563eb;
   --jin10-color: #d97706;
   --cls-color: #dc2626;

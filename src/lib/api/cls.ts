@@ -42,8 +42,8 @@ export async function fetchCLS(): Promise<FetchResult> {
 
         const items: NewsItem[] = (response.data.data?.roll_data || []).map((item: any) => ({
             id: `cls-${item.id}`,
-            title: item.title || item.content?.slice(0, 30),
-            content: item.content,
+            title: item.title,
+            content: item.content || item.title,
             time: item.ctime,
             source: 'cls',
             url: `https://www.cls.cn/detail/${item.id}`,

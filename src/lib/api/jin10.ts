@@ -28,7 +28,7 @@ export async function fetchJin10(): Promise<FetchResult> {
 
         const items: NewsItem[] = (response.data.data || []).map((item: any) => ({
             id: `jin10-${item.id}`,
-            title: item.data?.title || item.data?.content?.slice(0, 30) || 'No Title',
+            title: item.data?.title,
             content: item.data?.content || item.data?.title,
             time: new Date(item.time).getTime() / 1000, // Jin10 uses full timestamp string usually? Need to verify
             source: 'jin10',
