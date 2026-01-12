@@ -14,7 +14,7 @@ function deduplicate(items: NewsItem[]): NewsItem[] {
     // For now, just remove exact duplicate titles or IDs
     const seen = new Set();
     return sorted.filter(item => {
-        const key = item.title.trim() + '-' + item.source; // Allow same news from diff sources? 
+        const key = item.title?.trim() + '-' + item.source; // Allow same news from diff sources? 
         // User asked for "deduplication" (去重). 
         // Usually means merging same event from diff sources.
         // That's hard. Let's start by removing EXACT identical content if any, 
