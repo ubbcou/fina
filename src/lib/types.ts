@@ -6,6 +6,9 @@ export interface NewsItem {
     source: 'cls' | 'wscn' | 'jin10' | 'ths';
     url: string;
     tags?: string[];
+    pic?: string;
+    fantiPic?: string;
+    picTitle?: string;
 }
 
 export interface FetchResult {

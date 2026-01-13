@@ -82,3 +82,68 @@
     display: flex;
     align-items: center;
 }
+.picContainer {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    margin-top: 12px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background 0.2s;
+}
+
+.picContainer:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.picThumbnail {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+}
+
+.picInfo {
+    flex: 1;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.picTitle {
+    font-size: 14px;
+    color: var(--foreground);
+    font-weight: 500;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+    backdrop-filter: blur(4px);
+}
+
+.modalContent {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+}
+
+.modalImage {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
