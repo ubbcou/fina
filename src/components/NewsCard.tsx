@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { NewsItem } from "../lib/types";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { ExternalLink, Tag, ChevronRight, Box } from "lucide-react";
+import { ExternalLink, Tag, ChevronRight, Box, Share2 } from "lucide-react";
+import html2canvas from "html2canvas";
 import styles from "../styles/NewsCard.module.css";
 
 interface NewsCardProps {
@@ -26,6 +27,10 @@ const sourceNames: Record<string, string> = {
 
 export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Prevent scrolling when modal is open
@@ -39,6 +44,60 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
       document.body.style.overflow = "unset";
     };
   }, [isModalOpen]);
+
+  const handleShare = async () => {
+    if (isGeneratingShare || !shareCardRef.current) return;
+
+    try {
+      setIsGeneratingShare(true);
+
+      // 等待一小段时间确保DOM渲染完成
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // 使用html2canvas生成图片
+      const canvas = await html2canvas(shareCardRef.current, {
+        backgroundColor: null,
+        scale: 2, // 提高清晰度
+        logging: false,
+        useCORS: true,
+      });
+
+      // 将canvas转换为blob
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          try {
+            // 复制到剪贴板
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                "image/png": blob,
+              }),
+            ]);
+
+            // 显示成功提示
+            setToastMessage("✓ 分享图片已复制到剪贴板");
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 3000);
+          } catch (err) {
+            console.error("复制到剪贴板失败:", err);
+            // 如果剪贴板API失败，尝试下载图片
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `news-share-${item.id}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }
+        }
+        setIsGeneratingShare(false);
+      }, "image/png");
+    } catch (error) {
+      console.error("生成分享图片失败:", error);
+      setToastMessage("✗ 生成分享图片失败，请重试");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      setIsGeneratingShare(false);
+    }
+  };
 
   return (
     <div className={styles.card}>
@@ -54,14 +113,26 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
             {format(item.time * 1000, "yyyy-MM-dd HH:mm:ss", { locale: zhCN })}
           </span>
         </div>
-        <a
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: "var(--text-muted)" }}
-        >
-          <ExternalLink size={16} />
-        </a>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button
+            onClick={handleShare}
+            className={styles.iconButton}
+            title="分享"
+            disabled={isGeneratingShare}
+            style={{ opacity: isGeneratingShare ? 0.5 : 1 }}
+          >
+            <Share2 size={16} />
+          </button>
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.iconButton}
+            title="打开原文"
+          >
+            <ExternalLink size={16} />
+          </a>
+        </div>
       </div>
 
       <h3 className={styles.title}>{item.title}</h3>
@@ -119,6 +190,59 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
           </div>,
           document.body
         )}
+
+      {/* 隐藏的分享卡片，用于生成图片 */}
+      <div ref={shareCardRef} className={styles.shareCardHidden}>
+        <div className={styles.shareCardWindow}>
+          <div className={styles.shareCardTitleBar}>
+            <div className={styles.shareCardButtons}>
+              <span className={styles.shareCardButtonClose}></span>
+              <span className={styles.shareCardButtonMinimize}></span>
+              <span className={styles.shareCardButtonMaximize}></span>
+            </div>
+            <div className={styles.shareCardTitle}>分享</div>
+          </div>
+          <div className={styles.shareCardContent}>
+            <div className={styles.shareCardHeader}>
+              <span
+                className={styles.shareCardSource}
+                style={{
+                  backgroundColor: sourceColors[item.source] || "#666",
+                }}
+              >
+                {sourceNames[item.source] || item.source.toUpperCase()}
+              </span>
+              <span className={styles.shareCardTime}>
+                {format(item.time * 1000, "yyyy-MM-dd HH:mm:ss", {
+                  locale: zhCN,
+                })}
+              </span>
+            </div>
+            <h3 className={styles.shareCardContentTitle}>{item.title}</h3>
+            {item.content && item.content !== item.title && (
+              <p className={styles.shareCardContentText}>
+                {item.content.replace(/<[^>]*>?/gm, "")}
+              </p>
+            )}
+            {item.tags && item.tags.length > 0 && (
+              <div className={styles.shareCardTags}>
+                {item.tags.map((tag, idx) => (
+                  <span key={idx} className={styles.shareCardTag}>
+                    <Tag size={10} style={{ marginRight: 4 }} />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className={styles.shareCardFooter}>
+              <span className={styles.shareCardHost}>{location.hostname}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Toast 提示 */}
+      {showToast && <div className={styles.toast}>{toastMessage}</div>}
     </div>
   );
 };
