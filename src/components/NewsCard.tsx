@@ -7,6 +7,11 @@ import { ExternalLink, Tag, ChevronRight, Box, Share2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import styles from "../styles/NewsCard.module.css";
 
+// 常量定义
+const RENDER_DELAY = 100; // 等待DOM渲染完成的延迟时间(ms)
+const SHADOW_PADDING = 30; // 分享卡片阴影的padding(px)
+const TOAST_DURATION = 3000; // Toast提示显示时长(ms)
+
 interface NewsCardProps {
   item: NewsItem;
 }
@@ -52,7 +57,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
       setIsGeneratingShare(true);
 
       // 等待一小段时间确保DOM渲染完成
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, RENDER_DELAY));
 
       // 使用html2canvas生成卡片内容
       const cardCanvas = await html2canvas(shareCardRef.current, {
@@ -63,10 +68,9 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
       });
 
       // 创建新的canvas，添加阴影
-      const shadowPadding = 30; // 阴影的padding（2倍scale）
       const finalCanvas = document.createElement("canvas");
-      finalCanvas.width = cardCanvas.width + shadowPadding * 2;
-      finalCanvas.height = cardCanvas.height + shadowPadding * 2;
+      finalCanvas.width = cardCanvas.width + SHADOW_PADDING * 2;
+      finalCanvas.height = cardCanvas.height + SHADOW_PADDING * 2;
 
       const ctx = finalCanvas.getContext("2d");
       if (!ctx) throw new Error("无法获取canvas context");
@@ -78,7 +82,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
       ctx.shadowOffsetY = 10;
 
       // 绘制卡片内容
-      ctx.drawImage(cardCanvas, shadowPadding, shadowPadding);
+      ctx.drawImage(cardCanvas, SHADOW_PADDING, SHADOW_PADDING);
 
       // 将canvas转换为blob
       finalCanvas.toBlob(async (blob) => {
@@ -94,7 +98,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
             // 显示成功提示
             setToastMessage("✓ 分享图片已复制到剪贴板");
             setShowToast(true);
-            setTimeout(() => setShowToast(false), 3000);
+            setTimeout(() => setShowToast(false), TOAST_DURATION);
           } catch (err) {
             console.error("复制到剪贴板失败:", err);
             // 如果剪贴板API失败，尝试下载图片
@@ -104,6 +108,11 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
             a.download = `news-share-${item.id}.png`;
             a.click();
             URL.revokeObjectURL(url);
+
+            // 显示下载提示
+            setToastMessage("✓ 分享图片已下载到本地");
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), TOAST_DURATION);
           }
         }
         setIsGeneratingShare(false);
@@ -112,7 +121,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
       console.error("生成分享图片失败:", error);
       setToastMessage("✗ 生成分享图片失败，请重试");
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setTimeout(() => setShowToast(false), TOAST_DURATION);
       setIsGeneratingShare(false);
     }
   };
@@ -256,7 +265,9 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
               )}
               <div className={styles.shareCardFooter}>
                 <span className={styles.shareCardHost}>
-                  {location.hostname}
+                  {typeof window !== "undefined"
+                    ? window.location.hostname
+                    : ""}
                 </span>
               </div>
             </div>
