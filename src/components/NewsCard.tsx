@@ -54,16 +54,34 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
       // 等待一小段时间确保DOM渲染完成
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // 使用html2canvas生成图片
-      const canvas = await html2canvas(shareCardRef.current, {
+      // 使用html2canvas生成卡片内容
+      const cardCanvas = await html2canvas(shareCardRef.current, {
         backgroundColor: null,
         scale: 2, // 提高清晰度
         logging: false,
         useCORS: true,
       });
 
+      // 创建新的canvas，添加阴影
+      const shadowPadding = 30; // 阴影的padding（2倍scale）
+      const finalCanvas = document.createElement("canvas");
+      finalCanvas.width = cardCanvas.width + shadowPadding * 2;
+      finalCanvas.height = cardCanvas.height + shadowPadding * 2;
+
+      const ctx = finalCanvas.getContext("2d");
+      if (!ctx) throw new Error("无法获取canvas context");
+
+      // 绘制阴影
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 10;
+
+      // 绘制卡片内容
+      ctx.drawImage(cardCanvas, shadowPadding, shadowPadding);
+
       // 将canvas转换为blob
-      canvas.toBlob(async (blob) => {
+      finalCanvas.toBlob(async (blob) => {
         if (blob) {
           try {
             // 复制到剪贴板
@@ -193,49 +211,54 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
 
       {/* 隐藏的分享卡片，用于生成图片 */}
       <div ref={shareCardRef} className={styles.shareCardHidden}>
-        <div className={styles.shareCardWindow}>
-          <div className={styles.shareCardTitleBar}>
-            <div className={styles.shareCardButtons}>
-              <span className={styles.shareCardButtonClose}></span>
-              <span className={styles.shareCardButtonMinimize}></span>
-              <span className={styles.shareCardButtonMaximize}></span>
-            </div>
-            <div className={styles.shareCardTitle}>分享</div>
-          </div>
-          <div className={styles.shareCardContent}>
-            <div className={styles.shareCardHeader}>
-              <span
-                className={styles.shareCardSource}
-                style={{
-                  backgroundColor: sourceColors[item.source] || "#666",
-                }}
-              >
-                {sourceNames[item.source] || item.source.toUpperCase()}
-              </span>
-              <span className={styles.shareCardTime}>
-                {format(item.time * 1000, "yyyy-MM-dd HH:mm:ss", {
-                  locale: zhCN,
-                })}
-              </span>
-            </div>
-            <h3 className={styles.shareCardContentTitle}>{item.title}</h3>
-            {item.content && item.content !== item.title && (
-              <p className={styles.shareCardContentText}>
-                {item.content.replace(/<[^>]*>?/gm, "")}
-              </p>
-            )}
-            {item.tags && item.tags.length > 0 && (
-              <div className={styles.shareCardTags}>
-                {item.tags.map((tag, idx) => (
-                  <span key={idx} className={styles.shareCardTag}>
-                    <Tag size={10} style={{ marginRight: 4 }} />
-                    {tag}
-                  </span>
-                ))}
+        {/* 外层容器用于容纳阴影 */}
+        <div className={styles.shareCardContainer}>
+          <div className={styles.shareCardWindow}>
+            <div className={styles.shareCardTitleBar}>
+              <div className={styles.shareCardButtons}>
+                <span className={styles.shareCardButtonClose}></span>
+                <span className={styles.shareCardButtonMinimize}></span>
+                <span className={styles.shareCardButtonMaximize}></span>
               </div>
-            )}
-            <div className={styles.shareCardFooter}>
-              <span className={styles.shareCardHost}>{location.hostname}</span>
+              <div className={styles.shareCardTitle}>分享</div>
+            </div>
+            <div className={styles.shareCardContent}>
+              <div className={styles.shareCardHeader}>
+                <span
+                  className={styles.shareCardSource}
+                  style={{
+                    backgroundColor: sourceColors[item.source] || "#666",
+                  }}
+                >
+                  {sourceNames[item.source] || item.source.toUpperCase()}
+                </span>
+                <span className={styles.shareCardTime}>
+                  {format(item.time * 1000, "yyyy-MM-dd HH:mm:ss", {
+                    locale: zhCN,
+                  })}
+                </span>
+              </div>
+              <h3 className={styles.shareCardContentTitle}>{item.title}</h3>
+              {item.content && item.content !== item.title && (
+                <p className={styles.shareCardContentText}>
+                  {item.content.replace(/<[^>]*>?/gm, "")}
+                </p>
+              )}
+              {item.tags && item.tags.length > 0 && (
+                <div className={styles.shareCardTags}>
+                  {item.tags.map((tag, idx) => (
+                    <span key={idx} className={styles.shareCardTag}>
+                      <Tag size={10} style={{ marginRight: 4 }} />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className={styles.shareCardFooter}>
+                <span className={styles.shareCardHost}>
+                  {location.hostname}
+                </span>
+              </div>
             </div>
           </div>
         </div>

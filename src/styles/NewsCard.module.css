@@ -333,6 +333,12 @@
   font-weight: 500;
 }
 
+/* 分享卡片容器，用于容纳阴影 */
+.shareCardContainer {
+  padding: 0;
+  display: inline-block;
+}
+
 /* 隐藏的分享卡片，用于生成图片 */
 .shareCardHidden {
   position: fixed;
