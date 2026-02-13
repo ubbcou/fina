@@ -3,7 +3,7 @@ export interface NewsItem {
     title: string;
     content: string;
     time: number; // Unix timestamp in seconds
-    source: 'cls' | 'wscn' | 'jin10' | 'ths';
+    source: 'cls' | 'wscn' | 'jin10' | 'ths' | 'stcn';
     url: string;
     tags?: string[];
     pic?: string;

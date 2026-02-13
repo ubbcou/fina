@@ -21,6 +21,7 @@ const sourceColors: Record<string, string> = {
   jin10: "var(--jin10-color)",
   cls: "var(--cls-color)",
   ths: "var(--ths-color)",
+  stcn: "#e60012", // Securities Times Red
 };
 
 const sourceNames: Record<string, string> = {
@@ -28,6 +29,7 @@ const sourceNames: Record<string, string> = {
   jin10: "金十数据",
   cls: "财联社",
   ths: "同花顺",
+  stcn: "证券时报",
 };
 
 export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
@@ -215,7 +217,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({ item }) => {
               />
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       {/* 隐藏的分享卡片，用于生成图片 */}
