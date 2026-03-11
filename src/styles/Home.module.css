@@ -54,6 +54,22 @@
     padding: 4px 12px;
     border-radius: 999px;
     font-weight: 500;
+    margin-right: 12px;
+}
+
+.githubLink {
+    font-size: 12px;
+    color: #f3f4f6;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.githubLink:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .content {

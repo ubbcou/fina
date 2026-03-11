@@ -10,6 +10,9 @@ export default function Home() {
         </div>
         <div className={styles.nav}>
           <span className={styles.statusOnline}>● 实时监控中</span>
+          <a href="https://github.com/ubbcou/fina" target="_blank" rel="noopener noreferrer" className={styles.githubLink}>
+            GitHub
+          </a>
         </div>
       </header>
 
