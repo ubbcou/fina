@@ -4,6 +4,7 @@ import { NewsItem, FetchResult } from '../types';
 export async function fetchSTCN(): Promise<FetchResult> {
     try {
         const response = await axios.get('https://stcn.com/article/list.html', {
+            timeout: 8_000,
             params: {
                 type: 'kx',
                 page_time: '1'

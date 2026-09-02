@@ -7,6 +7,7 @@ export async function fetchThs(): Promise<FetchResult> {
         // This simple fetch will likely fail with 403, but placeholder for now.
         // Solution: Implement Puppeteer bridge later.
         const response = await axios.get('https://news.10jqka.com.cn/tapp/news/push/stock/', {
+            timeout: 8_000,
             params: {
                 page: 1,
                 tag: '',

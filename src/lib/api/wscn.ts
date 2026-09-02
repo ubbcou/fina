@@ -4,6 +4,7 @@ import { NewsItem, FetchResult } from '../types';
 export async function fetchWSCN(): Promise<FetchResult> {
     try {
         const response = await axios.get('https://api-prod.wallstreetcn.com/apiv1/content/lives', {
+            timeout: 8_000,
             params: {
                 channel: 'global-channel',
                 limit: 20

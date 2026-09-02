@@ -6,13 +6,11 @@ import { fetchThs } from '@/lib/api/ths';
 import { fetchSTCN } from '@/lib/api/stcn';
 import { NewsItem } from '@/lib/types';
 
-export const dynamic = 'force-dynamic'; // No caching for live news
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
-        const { searchParams } = new URL(request.url);
-        const source = searchParams.get('source');
-
         let items: NewsItem[] = [];
 
         // Parallel fetch
@@ -42,11 +40,18 @@ export async function GET(request: Request) {
         // Sort by time descending
         items.sort((a, b) => b.time - a.time);
 
-        return NextResponse.json({
-            items,
-            status: 'ok',
-            timestamp: Date.now()
-        });
+        return NextResponse.json(
+            {
+                items,
+                status: 'ok',
+                timestamp: Date.now()
+            },
+            {
+                headers: {
+                    'Cache-Control': 'public, s-maxage=20, stale-while-revalidate=40'
+                }
+            }
+        );
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

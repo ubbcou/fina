@@ -5,6 +5,7 @@ export async function fetchJin10(): Promise<FetchResult> {
     try {
         // Attempt with channel -24 (Common for 7x24), if fail, try others
         const response = await axios.get('https://flash-api.jin10.com/get_flash_list', {
+            timeout: 8_000,
             params: {
                 channel: '-8200',
                 limit: 20,

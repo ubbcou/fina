@@ -12,20 +12,20 @@ Fina 是一个强大且直观的实时财经新闻聚合平台。它无缝整合
 - **多源聚合**: 整合来自 **财联社 (CLS)**、**华尔街见闻 (WSCN)**、**金十数据 (Jin10)** 和 **同花顺 (Ths)** 的实时新闻流。
 - **实时更新**: 基于高效的 API 轮询机制，确保您在第一时间掌握市场动向。
 - **现代化 UI**: 采用 Next.js 15+ 构建，提供丝滑的响应式体验，支持自适应暗色/亮色模式。
-- **一键部署**: 内置自定义部署脚本，支持自动化上传及远程服务器（如阿里云）运维管理。
+- **自动部署**: 连接 GitHub 与 Vercel 后，分支和 Pull Request 自动生成预览，`main` 自动发布生产版本。
 
 ## 🛠️ 技术栈
 
 - **框架**: [Next.js](https://nextjs.org/) (App Router)
 - **语言**: [TypeScript](https://www.typescriptlang.org/)
 - **样式**: CSS Modules + Vanilla CSS
-- **部署**: Node.js SSH/SCP Automation
+- **部署**: GitHub + Vercel
 
 ## 🚀 快速开始
 
 ### 1. 环境准备
 
-确保您的本地环境已安装 Node.js 18.x 或更高版本。
+确保您的本地环境已安装 Node.js 20.9 或更高版本。
 
 ### 2. 安装依赖
 
@@ -46,32 +46,29 @@ npm run dev
 npm run build
 ```
 
-## 🌐 自动部署
+## 🌐 GitHub + Vercel 部署
 
-本项目包含一个自动化部署工具，专门针对私有服务器（如阿里云、腾讯云）进行了优化。
+项目保留动态 `/api/news` Route Handler，由 Vercel Functions 在 Node.js 运行时执行，不适合发布到仅支持静态文件的 GitHub Pages。
 
-### 配置环境
+### 首次连接
 
-1. 复制 `.env.example` 并重命名为 `.env`。
-2. 填写您的服务器信息：
-   ```env
-   DEPLOY_SERVER_IP=your_server_ip
-   DEPLOY_REMOTE_USER=root
-   DEPLOY_REMOTE_PATH=/root/workspace/fina
-   DEPLOY_PROJECT_NAME=fina
-   DEPLOY_PORT=3000
-   ```
+1. 登录 Vercel，选择 **Add New → Project**。
+2. 导入 GitHub 仓库 `ubbcou/fina`。
+3. 保持 Vercel 自动识别的 Next.js 配置：
+   - Root Directory：`.`
+   - Install Command：`npm install`（或留空）
+   - Build Command：`npm run build`（或留空）
+   - Output Directory：留空
+4. 当前应用不需要生产环境变量，直接点击 **Deploy**。
+5. 部署完成后检查首页与 `/api/news`。
 
-### 执行部署
+### 后续发布
 
-运行以下命令，脚本将自动完成构建、打包、上传、解压及远程服务重启：
+- 推送到普通分支或创建 Pull Request：生成 Preview Deployment。
+- 合并或推送到 `main`：发布 Production Deployment。
+- 如需自定义域名，在 Vercel 项目的 **Settings → Domains** 中添加。
 
-```bash
-npm run deploy
-```
-
-> [!TIP]
-> 部署脚本依赖于 SSH 密钥访问。请确保您的 SSH 密钥已添加到远程服务器的 `authorized_keys` 中，或在运行命令时输入密码。
+API 响应在 Vercel CDN 缓存 20 秒，并允许 40 秒 stale-while-revalidate，避免每个浏览器轮询都重复请求全部上游财经接口。
 
 ## 📁 项目结构
 
@@ -81,8 +78,6 @@ npm run deploy
 │   ├── lib/api/        # 各财经源数据抓取逻辑 (CLS, Jin10, WSCN, Ths)
 │   ├── components/     # UI 组件
 │   └── styles/         # 全局及模块样式
-├── scripts/
-│   └── deploy.js       # 自动化部署脚本
 └── public/             # 静态资源
 ```
 

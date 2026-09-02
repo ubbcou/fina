@@ -27,6 +27,7 @@ export async function fetchCLS(): Promise<FetchResult> {
         const sign = generateSign(params);
 
         const response = await axios.get('https://www.cls.cn/nodeapi/telegraphList', {
+            timeout: 8_000,
             params: { ...params, sign },
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
