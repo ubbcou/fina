@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { NewsItem, FetchResult } from '../types';
+import type { NewsItem, FetchResult } from '../types';
+
+export function parseJin10Time(time: string): number {
+    return Date.parse(`${time.replace(' ', 'T')}+08:00`) / 1000;
+}
 
 export async function fetchJin10(): Promise<FetchResult> {
     try {
@@ -32,7 +36,7 @@ export async function fetchJin10(): Promise<FetchResult> {
             id: `jin10-${item.id}`,
             title: item.data?.title,
             content: item.data?.content || item.data?.title,
-            time: new Date(item.time).getTime() / 1000, // Jin10 uses full timestamp string usually? Need to verify
+            time: parseJin10Time(item.time),
             source: 'jin10',
             url: item.data?.link || `https://flash.jin10.com/detail/${item.id}`,
             tags: [],
